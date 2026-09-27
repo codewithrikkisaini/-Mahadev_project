@@ -12,11 +12,28 @@
         </a>
 
         <div class="flex items-center gap-2">
+            @if($member->status === 'pending')
+                <form method="POST" action="{{ route('admin.members.approve', $member) }}" class="inline">
+                    @csrf
+                    <button type="submit" class="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-emerald-950/50 flex items-center gap-1.5 transition">
+                        <i class="fa-solid fa-check-circle"></i>
+                        <span>Approve Member</span>
+                    </button>
+                </form>
+
+                <form method="POST" action="{{ route('admin.members.reject', $member) }}" onsubmit="return confirm('Reject registration for {{ $member->name }}?');" class="inline">
+                    @csrf
+                    <button type="submit" class="px-3.5 py-2 bg-rose-950/60 hover:bg-rose-900 border border-rose-500/40 text-rose-300 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
+                        <i class="fa-solid fa-xmark"></i> Reject
+                    </button>
+                </form>
+            @endif
+
             <!-- Record Manual Payment Button -->
             <button
                 type="button"
                 @click="manualModal = true"
-                class="px-3.5 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl text-xs font-semibold shadow-md flex items-center gap-1.5 transition"
+                class="px-3.5 py-2 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white rounded-xl text-xs font-semibold shadow-md flex items-center gap-1.5 transition"
             >
                 <i class="fa-solid fa-plus-circle"></i>
                 <span>Record Cash / Manual Entry</span>
@@ -25,8 +42,48 @@
             <a href="{{ route('admin.members.edit', $member) }}" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
                 <i class="fa-solid fa-pen"></i> Edit Member
             </a>
+
+            <form method="POST" action="{{ route('admin.members.destroy', $member) }}" onsubmit="return confirm('Are you sure you want to permanently delete member {{ $member->name }} ({{ $member->member_code }})? All related payments will also be deleted.');" class="inline">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="px-3.5 py-2 bg-rose-950/40 hover:bg-rose-900/70 border border-rose-500/30 text-rose-300 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-trash"></i> Delete
+                </button>
+            </form>
         </div>
     </div>
+
+    @if($member->status === 'pending')
+        <!-- Pending Approval Alert Notification -->
+        <div class="p-5 rounded-2xl bg-gradient-to-r from-amber-950/80 via-orange-950/50 to-slate-900 border border-amber-500/40 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-3.5">
+                <div class="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-400 flex items-center justify-center text-xl font-bold animate-pulse">
+                    <i class="fa-solid fa-user-clock"></i>
+                </div>
+                <div>
+                    <h4 class="text-sm font-bold text-amber-300 flex items-center gap-2">
+                        <span>New Member Registration Pending Your Approval</span>
+                        <span class="px-2 py-0.5 rounded text-[10px] bg-amber-500 text-slate-950 font-bold uppercase">Pending</span>
+                    </h4>
+                    <p class="text-xs text-slate-300 mt-0.5">This member registered online and cannot log in until you approve the registration.</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2.5">
+                <form method="POST" action="{{ route('admin.members.approve', $member) }}" class="inline">
+                    @csrf
+                    <button type="submit" class="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl text-xs font-bold shadow flex items-center gap-1.5 transition">
+                        <i class="fa-solid fa-circle-check"></i> Approve & Activate
+                    </button>
+                </form>
+                <form method="POST" action="{{ route('admin.members.reject', $member) }}" onsubmit="return confirm('Reject registration for {{ $member->name }}?');" class="inline">
+                    @csrf
+                    <button type="submit" class="px-3.5 py-2 bg-slate-800 hover:bg-rose-950/80 text-rose-300 border border-slate-700 hover:border-rose-500/40 rounded-xl text-xs font-semibold transition">
+                        <i class="fa-solid fa-xmark"></i> Reject
+                    </button>
+                </form>
+            </div>
+        </div>
+    @endif
 
     <!-- Member Profile Overview Card & Summary Statistics -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">

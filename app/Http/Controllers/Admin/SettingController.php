@@ -22,8 +22,8 @@ class SettingController extends Controller
 
             // Payment settings
             'monthly_amount' => Setting::get('monthly_amount', 200),
-            'upi_id' => Setting::get('upi_id', 'templecommittee@upi'),
-            'payee_name' => Setting::get('payee_name', 'Mandir Seva Committee'),
+            'upi_id' => Setting::get('upi_id', 'rikkisaini4455-4@oksbi'),
+            'payee_name' => Setting::get('payee_name', 'Rikki Saini'),
             'qr_code_image' => Setting::get('qr_code_image', null),
             'payment_instructions' => Setting::get('payment_instructions', 'Scan the QR code using any UPI App (Google Pay, PhonePe, Paytm) and pay the exact monthly amount. Enter the 12-digit UTR/Transaction ID and attach the screenshot for verification.'),
             'receipt_prefix' => Setting::get('receipt_prefix', 'MSC-PAY'),

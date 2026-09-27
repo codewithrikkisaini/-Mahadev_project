@@ -43,6 +43,7 @@ class MemberController extends Controller
         $totalMembers = Member::count();
         $activeMembers = Member::where('status', 'active')->count();
         $inactiveMembers = Member::where('status', 'inactive')->count();
+        $pendingMembers = Member::where('status', 'pending')->count();
 
         return view('admin.members.index', compact(
             'members',
@@ -50,7 +51,8 @@ class MemberController extends Controller
             'status',
             'totalMembers',
             'activeMembers',
-            'inactiveMembers'
+            'inactiveMembers',
+            'pendingMembers'
         ));
     }
 
@@ -195,6 +197,52 @@ class MemberController extends Controller
     }
 
     /**
+     * Approve a pending member registration.
+     */
+    public function approve(Member $member)
+    {
+        DB::transaction(function () use ($member) {
+            $member->update(['status' => 'active']);
+            if ($member->user) {
+                $member->user->update(['status' => 'active']);
+                
+                \App\Models\CommitteeNotification::sendToUser(
+                    $member->user->id,
+                    'Membership Approved! 🙏',
+                    "Your registration for {$member->name} (Member ID: {$member->member_code}) has been approved by Super Admin. You can now login and make monthly seva contributions.",
+                    'general',
+                    route('member.dashboard')
+                );
+            }
+        });
+
+        return back()->with('success', "Member {$member->name} ({$member->member_code}) approved and activated successfully!");
+    }
+
+    /**
+     * Reject a pending member registration.
+     */
+    public function reject(Member $member)
+    {
+        DB::transaction(function () use ($member) {
+            $member->update(['status' => 'inactive']);
+            if ($member->user) {
+                $member->user->update(['status' => 'inactive']);
+
+                \App\Models\CommitteeNotification::sendToUser(
+                    $member->user->id,
+                    'Membership Application Update',
+                    "Your membership application was not approved. Please contact the Mandir Seva Committee.",
+                    'general',
+                    route('login')
+                );
+            }
+        });
+
+        return back()->with('warning', "Member {$member->name} ({$member->member_code}) was rejected / set to inactive.");
+    }
+
+    /**
      * Toggle member active/inactive status.
      */
     public function toggleStatus(Member $member)
@@ -209,6 +257,30 @@ class MemberController extends Controller
         });
 
         return back()->with('success', "Member {$member->member_code} is now {$newStatus}.");
+    }
+
+    /**
+     * Remove the specified member from storage.
+     */
+    public function destroy(Member $member)
+    {
+        $code = $member->member_code;
+        $name = $member->name;
+
+        DB::transaction(function () use ($member) {
+            // Delete member payments
+            $member->payments()->delete();
+
+            // Delete associated user account and notifications if exists
+            if ($member->user) {
+                $member->user->notifications()->delete();
+                $member->user->delete();
+            }
+
+            $member->delete();
+        });
+
+        return redirect()->route('admin.members.index')->with('success', "Member {$name} ({$code}) deleted successfully.");
     }
 
     /**

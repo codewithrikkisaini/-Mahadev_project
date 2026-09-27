@@ -59,6 +59,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->as('admin.')->group(funct
 
     // Member Management
     Route::resource('members', AdminMemberController::class);
+    Route::post('/members/{member}/approve', [AdminMemberController::class, 'approve'])->name('members.approve');
+    Route::post('/members/{member}/reject', [AdminMemberController::class, 'reject'])->name('members.reject');
     Route::post('/members/{member}/toggle-status', [AdminMemberController::class, 'toggleStatus'])->name('members.toggleStatus');
     Route::post('/members/{member}/manual-payment', [AdminMemberController::class, 'recordManualPayment'])->name('members.manualPayment');
 

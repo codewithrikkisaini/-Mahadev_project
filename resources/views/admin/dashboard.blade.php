@@ -45,6 +45,31 @@
     </div>
 </div>
 
+@php
+    $pendingMembersTotal = \App\Models\Member::where('status', 'pending')->count();
+@endphp
+
+@if($pendingMembersTotal > 0)
+    <!-- Pending Member Registrations Alert -->
+    <div class="p-4 rounded-2xl bg-gradient-to-r from-amber-950/70 via-orange-950/50 to-slate-900/90 border border-amber-500/40 shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-400 flex items-center justify-center font-bold text-lg animate-pulse">
+                <i class="fa-solid fa-user-clock"></i>
+            </div>
+            <div>
+                <h4 class="text-sm font-bold text-amber-300 flex items-center gap-2">
+                    <span>{{ $pendingMembersTotal }} New Member Join Request(s) Awaiting Approval</span>
+                    <span class="text-[10px] bg-amber-500 text-slate-950 px-2 py-0.5 rounded-full font-extrabold uppercase">Action Required</span>
+                </h4>
+                <p class="text-xs text-slate-300">New members registered online and need your approval before they can login and pay.</p>
+            </div>
+        </div>
+        <a href="{{ route('admin.members.index', ['status' => 'pending']) }}" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold rounded-xl text-xs shadow-md transition whitespace-nowrap flex items-center gap-1.5">
+            <i class="fa-solid fa-list-check"></i> Review & Approve Now &rarr;
+        </a>
+    </div>
+@endif
+
 <!-- 4 Top KPI Cards -->
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
     <!-- Collected This Month -->

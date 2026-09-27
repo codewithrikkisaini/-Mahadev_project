@@ -56,27 +56,31 @@
                 <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600"></div>
 
                 <div class="mb-3">
-                    <span class="text-[10px] uppercase font-bold tracking-widest text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
-                        Official Mandir UPI QR
-                    </span>
-                    <h4 class="text-sm font-bold font-cinzel text-slate-100 mt-2">{{ $templeName }}</h4>
-                    <p class="text-[11px] text-slate-400">{{ $payeeName }}</p>
+                    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-950/80 border border-amber-500/30 text-amber-400 text-[11px] font-bold">
+                        <i class="fa-brands fa-google-pay text-base text-sky-400"></i>
+                        <span>UPI QR Payment</span>
+                    </div>
+                    <h4 class="text-base font-bold font-cinzel text-slate-100 mt-2 flex items-center justify-center gap-2">
+                        <span>{{ $payeeName }}</span>
+                    </h4>
+                    <p class="font-mono text-[11px] text-amber-400/90 font-semibold">{{ $upiId }}</p>
                 </div>
 
                 <!-- QR Code Display Box -->
-                <div class="p-3 bg-white rounded-2xl shadow-xl border-4 border-amber-500/40 my-2 relative group">
+                <div class="p-3 bg-white rounded-2xl shadow-2xl border-4 border-amber-500/40 my-2 relative group">
                     @if(!empty($qrCodeImage))
                         <img src="{{ asset('storage/' . $qrCodeImage) }}" alt="Mandir QR" class="w-48 h-48 sm:w-52 sm:h-52 object-contain rounded-lg">
                     @else
-                        <!-- Dynamic QR Generated through reliable image service / SVG -->
+                        <!-- Dynamic QR Generated with Rikki Saini UPI URI -->
                         <img
-                            :src="'https://api.qrserver.com/v1/create-qr-code/?size=250x250&margin=4&data=' + encodeURIComponent(getUpiUri())"
+                            :src="'https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=4&data=' + encodeURIComponent(getUpiUri())"
                             alt="Scan UPI QR"
                             class="w-48 h-48 sm:w-52 sm:h-52 object-contain rounded-lg"
                         >
                     @endif
-                    <div class="mt-1 flex items-center justify-center gap-1 text-[10px] text-slate-800 font-bold">
-                        <span>Scan & Pay with any UPI App</span>
+                    <div class="mt-1 flex items-center justify-center gap-1.5 text-[10px] text-slate-900 font-bold">
+                        <i class="fa-brands fa-google-pay text-sm text-blue-600"></i>
+                        <span>Scan with GPay / PhonePe / Paytm</span>
                     </div>
                 </div>
 

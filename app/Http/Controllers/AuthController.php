@@ -47,8 +47,11 @@ class AuthController extends Controller
             if ($member && $member->user) {
                 $user = $member->user;
                 if (Hash::check($credentials['password'], $user->password)) {
+                    if ($user->status === 'pending') {
+                        return back()->withInput()->withErrors(['login' => 'Your registration (Member ID: ' . $member->member_code . ') is pending Super Admin approval. Please wait for approval before logging in. 🙏']);
+                    }
                     if ($user->status !== 'active') {
-                        return back()->withInput()->withErrors(['login' => 'Your account is inactive or pending approval.']);
+                        return back()->withInput()->withErrors(['login' => 'Your account is inactive. Please contact the Mandir Seva Committee.']);
                     }
                     Auth::login($user, $request->boolean('remember'));
                     $request->session()->regenerate();
@@ -60,8 +63,12 @@ class AuthController extends Controller
         $user = User::where($loginType, $credentials['login'])->first();
 
         if ($user && Hash::check($credentials['password'], $user->password)) {
+            if ($user->status === 'pending') {
+                $memberCode = $user->member ? $user->member->member_code : 'Pending';
+                return back()->withInput()->withErrors(['login' => 'Your registration (' . $memberCode . ') is pending Super Admin approval. Please wait for activation before logging in. 🙏']);
+            }
             if ($user->status !== 'active') {
-                return back()->withInput()->withErrors(['login' => 'Your account is inactive or pending approval.']);
+                return back()->withInput()->withErrors(['login' => 'Your account is inactive. Please contact the Mandir Seva Committee.']);
             }
 
             Auth::login($user, $request->boolean('remember'));
@@ -110,18 +117,18 @@ class AuthController extends Controller
             'joining_date' => ['nullable', 'date'],
         ]);
 
-        $user = DB::transaction(function () use ($validated) {
+        $memberCode = Member::generateNextCode();
+        $joiningDate = $validated['joining_date'] ?? Carbon::today()->format('Y-m-d');
+
+        $user = DB::transaction(function () use ($validated, $memberCode, $joiningDate) {
             $user = User::create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
                 'mobile' => $validated['mobile'],
                 'password' => Hash::make($validated['password']),
                 'role' => 'member',
-                'status' => 'active',
+                'status' => 'pending', // Pending Super Admin approval
             ]);
-
-            $memberCode = Member::generateNextCode();
-            $joiningDate = $validated['joining_date'] ?? Carbon::today()->format('Y-m-d');
 
             $member = Member::create([
                 'user_id' => $user->id,
@@ -131,24 +138,34 @@ class AuthController extends Controller
                 'email' => $validated['email'],
                 'address' => $validated['address'] ?? null,
                 'joining_date' => $joiningDate,
-                'status' => 'active',
+                'status' => 'pending', // Pending Super Admin approval
             ]);
 
-            // Welcome notification
+            // Welcome notification to member
             CommitteeNotification::sendToUser(
                 $user->id,
-                'Welcome to Mandir Seva Committee! 🙏',
-                "Your registration is successful. Your Member ID is {$memberCode}. Monthly Seva Amount: ₹" . Setting::getMonthlyAmount(),
+                'Registration Submitted 🙏',
+                "Your registration for {$member->name} (Member ID: {$memberCode}) has been received and is waiting for Super Admin approval.",
                 'general',
-                route('member.dashboard')
+                route('login')
             );
+
+            // Notification to Super Admin
+            $admins = User::where('role', 'admin')->get();
+            foreach ($admins as $admin) {
+                CommitteeNotification::sendToUser(
+                    $admin->id,
+                    'New Member Join Request 🙏',
+                    "{$member->name} ({$memberCode}, Mobile: {$member->mobile}) has registered and is waiting for your approval.",
+                    'member_pending',
+                    route('admin.members.index', ['status' => 'pending'])
+                );
+            }
 
             return $user;
         });
 
-        Auth::login($user);
-
-        return redirect()->route('member.dashboard')->with('success', 'Registration successful! Welcome to Mandir Seva Committee.');
+        return redirect()->route('login')->with('success', "Registration request submitted successfully! Your Member ID is {$memberCode}. Your account is currently pending Super Admin approval. You will be able to log in once approved. 🙏");
     }
 
     /**

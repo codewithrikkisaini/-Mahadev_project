@@ -32,6 +32,14 @@
         </div>
     </div>
 
+    <!-- Admin Approval Notice -->
+    <div class="mb-5 p-3 rounded-xl bg-slate-950/60 border border-amber-500/20 text-xs text-slate-300 flex items-start gap-2.5">
+        <i class="fa-solid fa-shield-halved text-amber-400 text-sm mt-0.5 shrink-0"></i>
+        <span>
+            <strong class="text-amber-300">Approval Process:</strong> After submitting your details, your registration will be reviewed and approved by the <strong>Super Admin</strong>. Once accepted, your account will be activated for sign-in.
+        </span>
+    </div>
+
     <form method="POST" action="{{ route('register') }}" class="space-y-4">
         @csrf
 

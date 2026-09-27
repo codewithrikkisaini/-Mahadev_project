@@ -20,9 +20,9 @@ class SettingSeeder extends Seeder
 
             // Payment
             ['key' => 'monthly_amount', 'value' => '200', 'group' => 'payment', 'type' => 'number', 'label' => 'Monthly Committee Amount'],
-            ['key' => 'upi_id', 'value' => 'templecommittee@upi', 'group' => 'payment', 'type' => 'string', 'label' => 'UPI ID'],
-            ['key' => 'payee_name', 'value' => 'Shri Mahadev Mandir Committee', 'group' => 'payment', 'type' => 'string', 'label' => 'Payee Name'],
-            ['key' => 'payment_instructions', 'value' => '1. Scan the dynamic QR code using Google Pay / PhonePe / Paytm / BHIM.\n2. Pay the exact monthly amount (₹200).\n3. Enter the 12-digit UTR/Ref number and upload payment screenshot.\n4. Admin will verify and issue the official receipt.', 'group' => 'payment', 'type' => 'text', 'label' => 'Payment Instructions'],
+            ['key' => 'upi_id', 'value' => 'rikkisaini4455-4@oksbi', 'group' => 'payment', 'type' => 'string', 'label' => 'UPI ID'],
+            ['key' => 'payee_name', 'value' => 'Rikki Saini', 'group' => 'payment', 'type' => 'string', 'label' => 'Payee Name'],
+            ['key' => 'payment_instructions', 'value' => '1. Scan the Google Pay / UPI QR code using any UPI App (GPay, PhonePe, Paytm, BHIM).\n2. Pay the exact monthly amount (₹200).\n3. Enter the 12-digit UTR/Ref number and upload payment screenshot.\n4. Admin will verify and issue the official receipt.', 'group' => 'payment', 'type' => 'text', 'label' => 'Payment Instructions'],
             ['key' => 'receipt_prefix', 'value' => 'MSC-PAY', 'group' => 'payment', 'type' => 'string', 'label' => 'Receipt Prefix'],
 
             // System

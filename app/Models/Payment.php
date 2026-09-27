@@ -71,9 +71,28 @@ class Payment extends Model
     public static function generateReceiptNumber(): string
     {
         $prefix = Setting::get('receipt_prefix', 'MSC-PAY');
-        $lastPayment = static::whereNotNull('receipt_number')->orderBy('id', 'desc')->first();
-        $nextNumber = $lastPayment ? ($lastPayment->id + 1) : 1;
+        
+        $existingReceipts = static::whereNotNull('receipt_number')->pluck('receipt_number');
+        $maxNumber = 0;
 
-        return sprintf('%s-%05d', $prefix, $nextNumber);
+        foreach ($existingReceipts as $rec) {
+            // Extract numeric digits from the end of receipt string
+            if (preg_match('/(\d+)$/', $rec, $matches)) {
+                $num = (int) $matches[1];
+                if ($num > $maxNumber) {
+                    $maxNumber = $num;
+                }
+            }
+        }
+
+        $nextNumber = $maxNumber + 1;
+        $candidate = sprintf('%s-%05d', $prefix, $nextNumber);
+
+        while (static::where('receipt_number', $candidate)->exists()) {
+            $nextNumber++;
+            $candidate = sprintf('%s-%05d', $prefix, $nextNumber);
+        }
+
+        return $candidate;
     }
 }

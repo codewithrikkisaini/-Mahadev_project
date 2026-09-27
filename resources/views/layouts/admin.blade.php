@@ -145,15 +145,24 @@
                     </a>
 
                     <!-- Members -->
+                    @php
+                        $pendingMembersCount = \App\Models\Member::where('status', 'pending')->count();
+                    @endphp
                     <a
                         href="{{ route('admin.members.index') }}"
                         class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition font-medium {{ request()->routeIs('admin.members.*') ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-lg shadow-orange-950/40' : 'text-slate-300 hover:bg-slate-800/80 hover:text-white' }}"
                     >
                         <i class="fa-solid fa-users text-base w-5 text-center {{ request()->routeIs('admin.members.*') ? 'text-white' : 'text-amber-400' }}"></i>
                         <span>Members</span>
-                        <span class="ml-auto text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
-                            {{ \App\Models\Member::count() }}
-                        </span>
+                        @if($pendingMembersCount > 0)
+                            <span class="ml-auto text-xs font-bold px-2 py-0.5 rounded-full bg-amber-500 text-slate-950 animate-pulse shadow-sm shadow-amber-500/50" title="{{ $pendingMembersCount }} pending member approvals">
+                                {{ $pendingMembersCount }} new
+                            </span>
+                        @else
+                            <span class="ml-auto text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+                                {{ \App\Models\Member::count() }}
+                            </span>
+                        @endif
                     </a>
 
                     <!-- Pending Verifications (Alert Badge) -->

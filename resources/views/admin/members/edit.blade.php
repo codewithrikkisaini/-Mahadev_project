@@ -170,17 +170,32 @@
             </div>
 
             <!-- Action Buttons -->
-            <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
-                <a href="{{ route('admin.members.show', $member) }}" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-semibold transition">
-                    Cancel
-                </a>
+            <div class="flex items-center justify-between pt-4 border-t border-slate-800">
                 <button
-                    type="submit"
-                    class="px-6 py-2.5 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white rounded-xl text-sm font-semibold shadow-lg shadow-orange-950/50 flex items-center gap-2 transition"
+                    type="button"
+                    onclick="if(confirm('Are you sure you want to permanently delete member {{ $member->name }} ({{ $member->member_code }})? All related payments will also be deleted.')) { document.getElementById('delete-member-form').submit(); }"
+                    class="px-4 py-2.5 bg-rose-950/40 hover:bg-rose-900/70 border border-rose-500/30 text-rose-300 rounded-xl text-sm font-semibold transition flex items-center gap-1.5"
                 >
-                    <i class="fa-solid fa-floppy-disk"></i> Update Changes
+                    <i class="fa-solid fa-trash"></i> Delete Member
                 </button>
+
+                <div class="flex items-center gap-3">
+                    <a href="{{ route('admin.members.show', $member) }}" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-semibold transition">
+                        Cancel
+                    </a>
+                    <button
+                        type="submit"
+                        class="px-6 py-2.5 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white rounded-xl text-sm font-semibold shadow-lg shadow-orange-950/50 flex items-center gap-2 transition"
+                    >
+                        <i class="fa-solid fa-floppy-disk"></i> Update Changes
+                    </button>
+                </div>
             </div>
+        </form>
+
+        <form id="delete-member-form" method="POST" action="{{ route('admin.members.destroy', $member) }}" class="hidden">
+            @csrf
+            @method('DELETE')
         </form>
     </div>
 </div>

@@ -183,9 +183,27 @@ class Member extends Model
     public static function generateNextCode(): string
     {
         $prefix = Setting::get('member_prefix', 'MSC');
-        $lastMember = static::orderBy('id', 'desc')->first();
-        $nextNumber = $lastMember ? ($lastMember->id + 1) : 1;
+        
+        $existingCodes = static::whereNotNull('member_code')->pluck('member_code');
+        $maxNumber = 0;
 
-        return sprintf('%s%05d', $prefix, $nextNumber);
+        foreach ($existingCodes as $code) {
+            if (preg_match('/(\d+)$/', $code, $matches)) {
+                $num = (int) $matches[1];
+                if ($num > $maxNumber) {
+                    $maxNumber = $num;
+                }
+            }
+        }
+
+        $nextNumber = $maxNumber + 1;
+        $candidate = sprintf('%s%05d', $prefix, $nextNumber);
+
+        while (static::where('member_code', $candidate)->exists()) {
+            $nextNumber++;
+            $candidate = sprintf('%s%05d', $prefix, $nextNumber);
+        }
+
+        return $candidate;
     }
 }

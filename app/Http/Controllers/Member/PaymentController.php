@@ -44,8 +44,8 @@ class PaymentController extends Controller
 
         $committeeName = Setting::get('committee_name', 'Shri Mahadev Mandir Seva Committee');
         $templeName = Setting::get('temple_name', 'Shri Mahadev Mandir');
-        $upiId = Setting::get('upi_id', 'templecommittee@upi');
-        $payeeName = Setting::get('payee_name', 'Mandir Seva Committee');
+        $upiId = Setting::get('upi_id', 'rikkisaini4455-4@oksbi');
+        $payeeName = Setting::get('payee_name', 'Rikki Saini');
         $qrCodeImage = Setting::get('qr_code_image', null);
         $paymentInstructions = Setting::get('payment_instructions', '');
 
